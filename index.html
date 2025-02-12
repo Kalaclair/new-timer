@@ -2,71 +2,132 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Countdown Timer Overlay</title>
+  <title>Floating Draggable Responsive Countdown Timer</title>
   <style>
-    /* Reset margins and set a transparent background */
+    /* Reset default margins and ensure full-screen usage */
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background: transparent;
       overflow: hidden;
       font-family: Arial, sans-serif;
+      /* The slide background color or image will show through */
+      background: #f2f2f2; 
     }
-    /* Center the timer container in the viewport */
-    .timer-container {
+    /* Full-screen slide container (you can add a background image here if desired) */
+    .slide {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      /* Example background image: */
+      /* background-image: url("your-slide-background.jpg"); */
+      /* background-size: cover; */
+      /* background-position: center; */
+    }
+    /* Draggable timer container with transparent background */
+    .draggable-timer {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border: 2px solid #333;
-      padding: 10px;
-      box-shadow: inset 0 0 0 1px #aaa;
-      border-radius: 8px;
-      /* Use a semi-transparent white background so the timer is visible */
-      background: rgba(255, 255, 255, 0.8);
+      top: 10%;     /* Initial vertical position as a percentage */
+      left: 10%;    /* Initial horizontal position as a percentage */
+      padding: 1em; /* Responsive padding */
+      background: transparent; /* Fully transparent background */
+      border: none; /* No border */
+      box-shadow: none; /* No shadow */
+      cursor: move; /* Indicates the element is draggable */
+      user-select: none; /* Prevents text selection while dragging */
     }
-    /* Responsive timer text */
+    /* Responsive timer text that scales between 2rem and 5rem */
     .timer {
       font-size: clamp(2rem, 8vw, 5rem);
-      color: #333;
-      text-align: center;
+      color: #fff; /* White digits */
       margin: 0;
+      text-align: center;
+      /* Subtle text shadow for improved legibility on varying backgrounds */
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
     }
   </style>
 </head>
 <body>
-  <div class="timer-container">
-    <div class="timer" id="timer">Loading...</div>
+  <div class="slide">
+    <!-- Floating, draggable timer container -->
+    <div class="draggable-timer" id="draggable-timer">
+      <div class="timer" id="timer">Loading...</div>
+    </div>
   </div>
+  
   <script>
+    /***********************
+     * Countdown Timer Code
+     ***********************/
     function updateTimer() {
-      const now = new Date();  // Get the host's local current time
-      const target = new Date(now);  // Start with current time as target
+      const now = new Date(); // Get the local current time
+      const target = new Date(now); // Copy current time
       
-      // Set the target to this hour at 5:00:00
+      // Set the target to this hour at 5:00:00 (i.e., 5 minutes past)
       target.setMinutes(5, 0, 0);
       
-      // If the current time is at or after 5:00:00, target next hour's 5:00:00
+      // If the current time is at or after 5:00:00, target the next hour's 5:00:00
       if (now >= target) {
         target.setHours(target.getHours() + 1);
       }
       
-      // Calculate the difference in total seconds between target and now
+      // Calculate the difference in seconds between target and now
       const totalSeconds = Math.floor((target - now) / 1000);
+      
+      // Convert to minutes and seconds
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
       
-      // Display the countdown with leading zeros for minutes and seconds
-      document.getElementById('timer').textContent =
+      // Update the timer display with leading zeros
+      document.getElementById("timer").textContent =
         String(minutes).padStart(2, '0') + ':' +
         String(seconds).padStart(2, '0');
     }
     
-    // Update the timer immediately and then every second
+    // Start the countdown immediately and update every second
     updateTimer();
     setInterval(updateTimer, 1000);
+    
+    /*******************************
+     * Draggable Functionality Code
+     *******************************/
+    // Make the element with ID "draggable-timer" draggable
+    dragElement(document.getElementById("draggable-timer"));
+    
+    function dragElement(elmnt) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      
+      elmnt.onmousedown = dragMouseDown;
+      
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Get the initial mouse cursor position:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+      
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // Set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+      }
+      
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
   </script>
 </body>
 </html>
