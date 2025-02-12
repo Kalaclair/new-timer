@@ -2,48 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Countdown Slide with Custom Background</title>
+  <title>Countdown Timer Overlay</title>
   <style>
-    /* Reset default margins and ensure full-screen usage */
+    /* Reset margins and set a transparent background */
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
+      background: transparent;
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
-    /* Full-screen slide container with background image */
-    .slide {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background-image: url("Q&A+Interpretation slide.png"); /* Make sure the file name is correct */
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    /* The label in the top-right corner */
-    .top-label {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      font-size: 1rem;
-      color: #333;
-    }
-    /* Container for the countdown timer with an elegant frame */
+    /* Center the timer container in the viewport */
     .timer-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       border: 2px solid #333;
-      padding: 20px;
+      padding: 10px;
       box-shadow: inset 0 0 0 1px #aaa;
       border-radius: 8px;
-      background: #fff;
+      /* Use a semi-transparent white background so the timer is visible */
+      background: rgba(255, 255, 255, 0.8);
     }
-    /* Responsive timer text that scales between 2rem and 5rem */
+    /* Responsive timer text */
     .timer {
       font-size: clamp(2rem, 8vw, 5rem);
       color: #333;
@@ -53,38 +37,34 @@
   </style>
 </head>
 <body>
-  <div class="slide">
-    <!-- Top-right label -->
-    <div class="top-label">...starting in:</div>
-    <!-- Centered timer container -->
-    <div class="timer-container">
-      <div class="timer" id="timer">Loading...</div>
-    </div>
+  <div class="timer-container">
+    <div class="timer" id="timer">Loading...</div>
   </div>
   <script>
     function updateTimer() {
-      // Get the host's local current time
-      const now = new Date();
-      // Create a target time based on the current time
-      const target = new Date(now);
+      const now = new Date();  // Get the host's local current time
+      const target = new Date(now);  // Start with current time as target
+      
       // Set the target to this hour at 5:00:00
       target.setMinutes(5, 0, 0);
-      // If the current time is at or after 5:00:00, target the next hour's 5:00:00
+      
+      // If the current time is at or after 5:00:00, target next hour's 5:00:00
       if (now >= target) {
         target.setHours(target.getHours() + 1);
       }
-      // Calculate the total difference in seconds between target and now
+      
+      // Calculate the difference in total seconds between target and now
       const totalSeconds = Math.floor((target - now) / 1000);
-      // Convert to minutes and seconds
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
-      // Display the countdown with leading zeros
+      
+      // Display the countdown with leading zeros for minutes and seconds
       document.getElementById('timer').textContent =
         String(minutes).padStart(2, '0') + ':' +
         String(seconds).padStart(2, '0');
     }
     
-    // Start the countdown immediately and update every second
+    // Update the timer immediately and then every second
     updateTimer();
     setInterval(updateTimer, 1000);
   </script>
